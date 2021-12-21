@@ -1,0 +1,140 @@
+$(document).ready(function(){
+	
+	$('.form-validate input').on('keyup', function (evt) {
+	     evt = (evt) ? evt : window.event;
+         var charCode = (evt.which) ? evt.which : evt.keyCode;
+          if(charCode!=13){			 
+			if($(this).val().length>0)
+			{		
+				$(this).removeClass('is-invalid');
+				$(this).addClass('is-valid');
+				$(this).parent().find('.error').remove();
+				$(this).addClass("is-valid");
+				
+				$('button[type=submit]').removeAttr("disabled");
+			}
+		 }
+	});
+	
+	$('.form-validate textarea').on('keyup', function (evt) {
+	     evt = (evt) ? evt : window.event;
+         var charCode = (evt.which) ? evt.which : evt.keyCode;
+         if(charCode!=13){
+			if($(this).val().length>0)
+			{		
+				$(this).removeClass('is-invalid');
+				$(this).addClass('is-valid');
+				$(this).parent().find('.error').remove();
+				$(this).addClass("is-valid");
+				
+				$('button[type=submit]').removeAttr("disabled");
+			}
+		 }
+	});
+
+	$('.form-validate select').on('change', function () {
+	  
+			if($(this).val().length>0){
+				
+				$(this).removeClass('is-invalid');
+				$(this).addClass('is-valid');
+				$(this).parent().find('.error').remove();
+				$(this).addClass("is-valid");				
+				$('button[type=submit]').removeAttr("disabled");
+			}
+		 
+	});
+	
+	$('.form-validate input').on('change', function () {
+	  
+			if($(this).val().length>0){
+				
+				$(this).removeClass('is-invalid');
+				$(this).addClass('is-valid');
+				$(this).parent().find('.error').remove();
+				$(this).addClass("is-valid");				
+				$('button[type=submit]').removeAttr("disabled");
+			}
+		 
+	});
+	
+	
+});
+
+function isNumber(evt){
+    evt = (evt) ? evt : window.event;
+    var charCode = (evt.which) ? evt.which : evt.keyCode;	
+    if (charCode > 31 && (charCode < 45 || charCode > 57)) 
+	{
+        return false;
+    }
+    return true;
+}
+function uploadFile(x){
+	var ext = $(x).val().split('.').pop();	
+	if(ext=='png' || ext=='jpg' || ext=='jpeg' || ext=='bmp' || ext=='gif' || ext=='pdf'){
+		var file_size=($(x)[0].files[0].size/ 1024);
+        if(file_size<1000){
+			
+			$(x).removeClass('is-invalid');
+			$(x).addClass('is-valid');
+			$(x).parent().find('.error').remove();
+			$(x).parent().find('.success').remove();
+			$(x).addClass("is-valid");
+			$(x).parent().append('<div class="success">Uploading...</div>');
+			$.ajax
+				({
+					url: ''+baseurl+'/customer/Profile/uploadFile',    	
+					type: "POST",      	
+					data: new FormData(),	
+					data:  new FormData(document.getElementById("uploadFile")),
+					contentType: false,       		
+					cache: false,					
+					processData:false, 
+					dataType: "json", 
+					beforeSend:function(){
+						$('button[type=submit]').attr('disabled','disabled'); 			
+					},
+					success: function(data)  		
+					{
+						$(x).val("");
+					    $("#uploadFile #csrf_test_name").val(data.csrf); 	
+						if(data.status==0){
+							$(x).removeClass('is-valid');
+							$(x).addClass('is-invalid');			                
+							$(x).parent().find('.success').remove();
+							$(x).parent().find('.error').remove();
+							$(x).parent().append('<div class="error">'+data.message+'</div>');
+						}
+						else{
+							$(x).removeClass('is-invalid');
+							$(x).addClass('is-valid');
+							$("#idProof").val(data.fileName);
+							$(x).parent().find('.error').remove();
+							$(x).parent().find('.success').remove();
+							$(x).parent().append('<div class="success">'+data.message+'</div>');
+						}
+						$('button[type=submit]').removeAttr("disabled");
+                    }
+                });	
+			
+		}
+        else{
+			$(x).parent().find('.error').remove();
+			$(x).parent().find('.success').remove();
+			$(x).removeClass('is-valid');
+			$(x).addClass('is-invalid');
+			$(x).parent().append('<div class="error">Please Upload up to 1MB File</div>');
+		}			
+	}
+	else{
+		$(x).parent().find('.error').remove();
+		$(x).parent().find('.success').remove();
+		$(x).removeClass('is-valid');
+		$(x).addClass('is-invalid');
+		$(x).parent().append('<div class="error">Please Upload Image / Pdf File</div>');
+			
+	}
+	
+}
+	
